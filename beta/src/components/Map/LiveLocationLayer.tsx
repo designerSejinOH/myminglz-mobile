@@ -10,7 +10,7 @@ type Tracking = false | 'observe' | 'follow'
 
 export default function LiveLocationLayer() {
   const map = useGoogleMap()
-  const { permission, loc, error, startWatch, stopWatch } = useGeolocation()
+  const { permission, loc, error, requestPermission, startWatch, stopWatch } = useGeolocation()
   const [tracking, setTracking] = useState<Tracking>('follow') // 기본값: follow
   const panLock = useRef(false) // 과도한 panTo 방지(간단 스로틀)
 
@@ -37,10 +37,10 @@ export default function LiveLocationLayer() {
     return () => stopWatch()
   }, [stopWatch])
 
-  // 사용자 제스처로 위치 권한 요청
+  // 사용자 제스처로 위치 권한 요청 (getCurrentPosition 사용 — Safari 호환)
   const handleRequestPermission = useCallback(() => {
-    startWatch()
-  }, [startWatch])
+    requestPermission()
+  }, [requestPermission])
 
   // follow일 때 카메라가 사용자 따라감 (간단 스로틀)
   useEffect(() => {
@@ -82,8 +82,8 @@ export default function LiveLocationLayer() {
             className='absolute left-1/2 -translate-x-1/2 bottom-2 z-[1] bg-white/70 backdrop-blur-md rounded-lg overflow-hidden font-medium text-red-400 px-3 py-2 w-fit text-sm shadow'
           >
             {!loc && (permission === 'prompt' || permission === 'unknown') && (
-              <button onClick={handleRequestPermission} className=''>
-                위치 권한을 허용해 주세요.
+              <button onClick={handleRequestPermission} className='underline active:opacity-60'>
+                탭하여 위치 권한을 허용해 주세요.
               </button>
             )}
             {permission === 'denied' && (

@@ -12,6 +12,12 @@ export type Loc = {
   timestamp: number
 }
 
+const geoOpts: PositionOptions = {
+  enableHighAccuracy: true,
+  maximumAge: 3000,
+  timeout: 15000,
+}
+
 export function useGeolocation() {
   const [permission, setPermission] = useState<PermissionState>('unknown')
   const [loc, setLoc] = useState<Loc | null>(null)
@@ -34,6 +40,36 @@ export function useGeolocation() {
     }
   }, [])
 
+  const handlePosition = useCallback((pos: GeolocationPosition) => {
+    const { latitude, longitude, accuracy, heading, speed } = pos.coords
+    setLoc({
+      lat: latitude,
+      lng: longitude,
+      accuracy,
+      heading,
+      speed,
+      timestamp: pos.timestamp,
+    })
+    setPermission('granted')
+  }, [])
+
+  const handleError = useCallback((err: GeolocationPositionError) => {
+    if (err.code === err.PERMISSION_DENIED) setPermission('denied')
+    setError(err.message || '위치 정보를 가져오지 못했어요.')
+  }, [])
+
+  // getCurrentPosition으로 권한 요청 (Safari 호환 — watchPosition보다 안정적)
+  // 반드시 사용자 제스처(클릭/탭) 안에서 호출해야 네이티브 팝업이 표시됨
+  const requestPermission = useCallback(() => {
+    if (!navigator.geolocation) {
+      setError('이 브라우저는 위치 기능을 지원하지 않습니다.')
+      return
+    }
+    setError(null)
+    navigator.geolocation.getCurrentPosition(handlePosition, handleError, geoOpts)
+  }, [handlePosition, handleError])
+
+  // 연속 위치 추적 시작 (이미 권한이 허용된 상태에서만 사용)
   const startWatch = useCallback(() => {
     if (!navigator.geolocation) {
       setError('이 브라우저는 위치 기능을 지원하지 않습니다.')
@@ -47,34 +83,12 @@ export function useGeolocation() {
     }
 
     setError(null)
-
-    // 기본값: 고정밀 on, 3초 캐시 허용, 15초 타임아웃
-    const opts: PositionOptions = {
-      enableHighAccuracy: true,
-      maximumAge: 3000,
-      timeout: 15000,
-    }
-
     watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude, accuracy, heading, speed } = pos.coords
-        setLoc({
-          lat: latitude,
-          lng: longitude,
-          accuracy,
-          heading,
-          speed,
-          timestamp: pos.timestamp,
-        })
-        setPermission('granted')
-      },
-      (err) => {
-        if (err.code === err.PERMISSION_DENIED) setPermission('denied')
-        setError(err.message || '위치 정보를 가져오지 못했어요.')
-      },
-      opts,
+      handlePosition,
+      handleError,
+      geoOpts,
     )
-  }, [])
+  }, [handlePosition, handleError])
 
   const stopWatch = useCallback(() => {
     if (watchIdRef.current != null) {
@@ -83,5 +97,5 @@ export function useGeolocation() {
     }
   }, [])
 
-  return { permission, loc, error, startWatch, stopWatch }
+  return { permission, loc, error, requestPermission, startWatch, stopWatch }
 }
