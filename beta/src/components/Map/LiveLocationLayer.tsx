@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CircleF, MarkerF, useGoogleMap } from '@react-google-maps/api'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { NavBarHeight } from '@/constants/sizeguide'
@@ -22,12 +22,25 @@ export default function LiveLocationLayer() {
     return () => google.maps.event.clearListeners(map, 'dragstart')
   }, [map])
 
-  // 권한/워치 시작 (버튼 없이 자동 시작 원치 않으면, 버튼으로 옮기면 됨)
+  // 이미 권한이 허용된 경우에만 자동 시작
+  // prompt/unknown 상태에서는 사용자 제스처(버튼 클릭) 뒤에 요청해야
+  // 모바일 브라우저(특히 iOS Safari)에서 네이티브 권한 팝업이 정상적으로 표시됨
   useEffect(() => {
-    // iOS Safari는 사용자 제스처 뒤 요청이 더 안정적이지만, 기본값으로 바로 시도
-    startWatch()
+    if (permission === 'granted') {
+      startWatch()
+      return () => stopWatch()
+    }
+  }, [permission, startWatch, stopWatch])
+
+  // 컴포넌트 언마운트 시 watch 정리
+  useEffect(() => {
     return () => stopWatch()
-  }, [startWatch, stopWatch])
+  }, [stopWatch])
+
+  // 사용자 제스처로 위치 권한 요청
+  const handleRequestPermission = useCallback(() => {
+    startWatch()
+  }, [startWatch])
 
   // follow일 때 카메라가 사용자 따라감 (간단 스로틀)
   useEffect(() => {
@@ -69,7 +82,9 @@ export default function LiveLocationLayer() {
             className='absolute left-1/2 -translate-x-1/2 bottom-2 z-[1] bg-white/70 backdrop-blur-md rounded-lg overflow-hidden font-medium text-red-400 px-3 py-2 w-fit text-sm shadow'
           >
             {!loc && (permission === 'prompt' || permission === 'unknown') && (
-              <div className=''>위치 권한을 허용해 주세요.</div>
+              <button onClick={handleRequestPermission} className=''>
+                위치 권한을 허용해 주세요.
+              </button>
             )}
             {permission === 'denied' && (
               <div className=''>위치 접근이 거부되었습니다. 브라우저 설정에서 허용해 주세요.</div>

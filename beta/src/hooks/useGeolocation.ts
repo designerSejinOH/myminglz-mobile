@@ -39,6 +39,13 @@ export function useGeolocation() {
       setError('이 브라우저는 위치 기능을 지원하지 않습니다.')
       return
     }
+
+    // 기존 watch가 있으면 제거 (중복 방지)
+    if (watchIdRef.current != null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+      watchIdRef.current = null
+    }
+
     setError(null)
 
     // 기본값: 고정밀 on, 3초 캐시 허용, 15초 타임아웃
