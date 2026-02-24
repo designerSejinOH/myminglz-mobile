@@ -169,11 +169,11 @@ export default function SettingsPage() {
   return (
     <>
       <Screen
-        className={classNames('bg-[#242424]')}
+        className={classNames('bg-[#242424]', 'fixed inset-0 z-50')}
         header={{
           title: '설정',
           left: {
-            icon: 'arrow-left',
+            icon: 'left',
             onClick: () => router.back(),
           },
         }}
@@ -370,9 +370,7 @@ export default function SettingsPage() {
                 disabled={isDeleting || deleteConfirmText !== '계정삭제'}
                 className='flex-1 h-12 bg-red-600 rounded-xl flex justify-center items-center active:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                <span className='text-sm font-medium text-white'>
-                  {isDeleting ? '삭제 중...' : '삭제'}
-                </span>
+                <span className='text-sm font-medium text-white'>{isDeleting ? '삭제 중...' : '삭제'}</span>
               </button>
             </div>
           </div>

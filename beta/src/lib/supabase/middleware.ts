@@ -19,9 +19,7 @@ export async function updateSession(request: NextRequest) {
           supabaseResponse = NextResponse.next({
             request,
           })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          )
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
         },
       },
     },
@@ -42,7 +40,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
 
   // 프로필 설정 라우트
-  const profileSetupRoute = '/profile/setup'
+  const profileSetupRoute = '/auth/onboarding'
   const isProfileSetupRoute = pathname.startsWith(profileSetupRoute)
 
   // 보호된 라우트 (로그인 + 이메일 확인 + 프로필 필요)
@@ -70,18 +68,14 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 3. 이메일 확인된 사용자 - 프로필 체크
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', user.id)
-    .single()
+  const { data: profile } = await supabase.from('profiles').select('id').eq('id', user.id).single()
 
   const hasProfile = !!profile
 
   if (!hasProfile) {
     // 프로필 미설정 시 setup 페이지만 허용
     if (!isProfileSetupRoute && !isPublicRoute) {
-      return NextResponse.redirect(new URL('/profile/setup', request.url))
+      return NextResponse.redirect(new URL('/auth/onboarding', request.url))
     }
     return supabaseResponse
   }

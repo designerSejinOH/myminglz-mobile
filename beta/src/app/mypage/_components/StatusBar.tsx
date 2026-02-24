@@ -18,7 +18,6 @@ export const StatusBar = ({ credit }: { credit: number }) => {
         <button onClick={() => router.push('/mypage/settings')} className='active:scale-95 transition-transform'>
           설정
         </button>
-        <Icon icon='star' size={24} />
       </div>
     </div>
   )

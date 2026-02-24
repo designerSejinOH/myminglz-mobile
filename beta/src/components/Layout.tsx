@@ -28,7 +28,7 @@ export const Layout = ({ children }) => {
       >
         {children}
         <Toaster />
-        {pathname !== '/' && <NavBar />}
+        {pathname !== '/' && !pathname.includes('/auth') && <NavBar />}
       </motion.div>
     </>
   )

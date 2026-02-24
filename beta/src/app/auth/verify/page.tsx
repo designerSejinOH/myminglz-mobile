@@ -17,7 +17,7 @@ export default function VerifyEmailPage() {
   // 이미 이메일 확인된 경우 리다이렉트
   useEffect(() => {
     if (!isLoading && user?.email_confirmed_at) {
-      router.push('/profile/setup')
+      router.push('/auth/onboarding')
     }
   }, [user, isLoading, router])
 
@@ -52,10 +52,12 @@ export default function VerifyEmailPage() {
 
   const handleRefreshStatus = async () => {
     // 세션 새로고침하여 이메일 확인 상태 업데이트
-    const { data: { session } } = await supabase.auth.refreshSession()
+    const {
+      data: { session },
+    } = await supabase.auth.refreshSession()
     if (session?.user?.email_confirmed_at) {
       toast.success('이메일이 확인되었습니다!')
-      router.push('/profile/setup')
+      router.push('/auth/onboarding')
     } else {
       toast.error('아직 이메일이 확인되지 않았습니다')
     }
@@ -130,9 +132,7 @@ export default function VerifyEmailPage() {
         </div>
 
         {/* Help text */}
-        <p className='text-xs text-gray-500 text-center'>
-          이메일이 오지 않았다면 스팸함을 확인해주세요
-        </p>
+        <p className='text-xs text-gray-500 text-center'>이메일이 오지 않았다면 스팸함을 확인해주세요</p>
       </div>
 
       <div className='w-full h-fit py-8 text-center text-sm font-normal leading-[1.2] opacity-40'>© ZERONINEZ</div>

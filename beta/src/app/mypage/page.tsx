@@ -5,23 +5,22 @@ import { Icon, NavBar, Screen } from '@/components'
 import { useRouter } from 'next/navigation'
 import { AliasButton, PostShelves, ProfileCard, StatusBar } from './_components'
 import { NavBarHeight } from '@/constants/sizeguide'
+import { useProfileStore } from '@/stores/profileStore'
+import { useEffect } from 'react'
+import { useAuthStore } from '@/stores/authStore'
 
 export default function Page() {
   const router = useRouter()
 
-  const DUMMY = {
-    profile: {
-      id: 'Zeroninez',
-      credit: 1300,
-      follower: 365,
-      following: 234,
-      profileImage: null,
-      name: '제로나인즈',
-      subname: '대표이사/PM',
-      description: `아이디어 장전 완료🎯 | 서비스 기획러 | UX 탐험가 | IT 마법사 사람을 잇는 디자인, 경험을 만드는 기획 | IT & UX 설계자아아아아아아아아아아아아아아아입니다.`,
-      link: 'https://myminglz.com',
-    },
-  }
+  const { user, signOut } = useAuthStore()
+  const { profile, fetchProfile } = useProfileStore()
+
+  // 프로필 로드
+  useEffect(() => {
+    if (user) {
+      fetchProfile(user.id)
+    }
+  }, [user, fetchProfile])
 
   const MYPOSTS = [
     { id: 1, title: '첫 번째 글', content: '안녕하세요! 이것은 첫 번째 글입니다.' },
@@ -42,17 +41,17 @@ export default function Page() {
           }}
           className='w-full flex flex-col snap-start justify-start items-center pt-2 px-2 gap-1'
         >
-          <StatusBar credit={DUMMY.profile.credit} />
+          <StatusBar credit={0} />
           <ProfileCard
-            id={DUMMY.profile.id}
-            follower={DUMMY.profile.follower}
-            following={DUMMY.profile.following}
-            profileImage={DUMMY.profile.profileImage}
-            name={DUMMY.profile.name}
-            subname={DUMMY.profile.subname}
-            description={DUMMY.profile.description}
+            id={profile?.username || 'unknown'}
+            follower={0}
+            following={0}
+            profileImage={null}
+            name={profile?.display_name || 'Unknown User'}
+            subname={'-'}
+            description={profile?.bio || ''}
           />
-          <AliasButton text={DUMMY.profile.id} link={DUMMY.profile.link} />
+          <AliasButton text={profile?.username || 'unknown'} link={''} />
         </div>
         <div className='w-full min-h-[120vw] px-2 flex flex-col snap-start justify-start items-center gap-1'>
           <PostShelves />
