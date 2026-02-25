@@ -31,11 +31,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
 
-  // 공개 라우트 (로그인 불필요)
-  const publicRoutes = ['/']
+  // 공개 라우트 (로그인 불필요, 로그인 완료 시 /map으로 리다이렉트)
+  const publicRoutes = ['/', '/auth/login', '/auth/signup']
   const isPublicRoute = publicRoutes.includes(pathname)
 
-  // 인증 관련 라우트
+  // 인증 관련 라우트 (로그인 후 이메일 미확인 사용자용)
   const authRoutes = ['/auth/verify']
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
 
