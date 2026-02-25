@@ -49,8 +49,9 @@ export async function updateSession(request: NextRequest) {
 
   // 1. 비로그인 사용자
   if (!user) {
-    // 보호된 라우트, 인증 라우트, 프로필 설정 접근 시 홈으로
-    if (isProtectedRoute || isAuthRoute || isProfileSetupRoute) {
+    // 보호된 라우트, 프로필 설정 접근 시 홈으로
+    // auth/verify는 signUp 직후 세션이 없는 상태에서도 접근 가능해야 함
+    if (isProtectedRoute || isProfileSetupRoute) {
       return NextResponse.redirect(new URL('/', request.url))
     }
     return supabaseResponse

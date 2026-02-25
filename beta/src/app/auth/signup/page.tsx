@@ -56,7 +56,7 @@ export default function SignupPage() {
     }
 
     // 회원가입 성공 → 이메일 인증 대기 페이지로 이동
-    // 이메일과 비밀번호 정보를 verify 페이지에서 사용할 수 있도록 query로 전달
+    toast.success('인증 이메일을 보냈습니다. 메일함을 확인해주세요!')
     router.push(`/auth/verify?email=${encodeURIComponent(email)}`)
   }
 
