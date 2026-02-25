@@ -11,7 +11,8 @@ import toast from 'react-hot-toast'
 export default function SettingsPage() {
   const router = useRouter()
   const { user, signOut } = useAuthStore()
-  const { profile, fetchProfile, updateProfile, checkUsernameAvailable } = useProfileStore()
+  // AuthProvider가 로그인 시 자동으로 프로필을 로드하므로 별도 fetch 불필요
+  const { profile, updateProfile, checkUsernameAvailable } = useProfileStore()
 
   const [isEditing, setIsEditing] = useState(false)
   const [displayName, setDisplayName] = useState('')
@@ -24,13 +25,6 @@ export default function SettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
-
-  // 프로필 로드
-  useEffect(() => {
-    if (user) {
-      fetchProfile(user.id)
-    }
-  }, [user, fetchProfile])
 
   // 프로필 데이터로 폼 초기화
   useEffect(() => {
