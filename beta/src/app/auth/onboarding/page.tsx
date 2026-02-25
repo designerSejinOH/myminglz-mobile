@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Screen } from '@/components'
 import { useAuthStore } from '@/stores/authStore'
@@ -11,7 +11,8 @@ import toast from 'react-hot-toast'
 export default function ProfileSetupPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuthStore()
-  const { profile, isLoading: profileLoading, createProfile, checkUsernameAvailable, fetchProfile } = useProfileStore()
+  // AuthProvider가 로그인 시 자동으로 프로필을 로드하므로 별도 fetch 불필요
+  const { profile, isLoading: profileLoading, createProfile, checkUsernameAvailable } = useProfileStore()
 
   const [displayName, setDisplayName] = useState('')
   const [username, setUsername] = useState('')
@@ -21,16 +22,12 @@ export default function ProfileSetupPage() {
 
   const [onboardingStep, setOnboardingStep] = useState(0) // 0: 아이디 1: 프로필 설정 2: 한줄 소개
 
-  // 이미 프로필이 있으면 메인으로 이동
+  // 프로필이 이미 있으면 메인으로 이동 (AuthProvider가 이미 fetch 완료한 상태)
   useEffect(() => {
-    if (user && !authLoading) {
-      fetchProfile(user.id).then((existingProfile) => {
-        if (existingProfile) {
-          router.push('/map')
-        }
-      })
+    if (!authLoading && !profileLoading && profile) {
+      router.push('/map')
     }
-  }, [user, authLoading, fetchProfile, router])
+  }, [authLoading, profileLoading, profile, router])
 
   // username 중복 체크 (디바운스)
   useEffect(() => {

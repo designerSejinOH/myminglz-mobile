@@ -6,21 +6,14 @@ import { useRouter } from 'next/navigation'
 import { AliasButton, PostShelves, ProfileCard, StatusBar } from './_components'
 import { NavBarHeight } from '@/constants/sizeguide'
 import { useProfileStore } from '@/stores/profileStore'
-import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 
 export default function Page() {
   const router = useRouter()
 
-  const { user, signOut } = useAuthStore()
-  const { profile, fetchProfile } = useProfileStore()
-
-  // 프로필 로드
-  useEffect(() => {
-    if (user) {
-      fetchProfile(user.id)
-    }
-  }, [user, fetchProfile])
+  const { signOut } = useAuthStore()
+  // AuthProvider가 로그인 시 자동으로 프로필을 로드하므로 별도 fetch 불필요
+  const { profile } = useProfileStore()
 
   const MYPOSTS = [
     { id: 1, title: '첫 번째 글', content: '안녕하세요! 이것은 첫 번째 글입니다.' },
