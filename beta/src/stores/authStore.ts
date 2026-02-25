@@ -41,6 +41,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          // 이메일 인증 링크 클릭 시 /auth/callback으로 이동 → 세션 생성 → 온보딩
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       })
       if (error) throw error
       return { error: null }
