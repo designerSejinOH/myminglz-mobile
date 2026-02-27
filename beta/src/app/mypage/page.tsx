@@ -36,6 +36,7 @@ export default function Page() {
         >
           <StatusBar credit={0} />
           <ProfileCard
+            mode='user'
             profiles={[profile, profile, profile]} // 추후 팔로워/팔로잉 프로필 이미지 배열로 대체
           />
           <AliasButton text={profile?.username || 'unknown'} link={''} />
