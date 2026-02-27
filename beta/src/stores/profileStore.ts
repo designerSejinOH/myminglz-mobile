@@ -57,12 +57,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
-  // userId = auth.users.id → user_id 컬럼으로 삽입, id는 DB에서 자동 생성
+  // userId = auth.users.id → user_id 컬럼으로 삽입, id는 profiles.id에 DEFAULT가 없으므로 클라이언트에서 생성
   createProfile: async (userId, data) => {
     try {
       const { data: newProfile, error } = await supabase
         .from('profiles')
         .insert({
+          id: crypto.randomUUID(),
           user_id: userId,
           username: data.username,
           display_name: data.display_name,
