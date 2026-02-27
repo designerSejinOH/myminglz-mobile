@@ -112,12 +112,12 @@ export default function SettingsPage() {
   }
 
   const handleSaveProfile = async () => {
-    if (!user) return
+    if (!user || !profile) return
     if (!validateForm()) return
 
     setIsSubmitting(true)
 
-    const { error } = await updateProfile(user.id, {
+    const { error } = await updateProfile(profile.id, {
       display_name: displayName.trim(),
       username: username.toLowerCase(),
       bio: bio.trim(),

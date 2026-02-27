@@ -13,7 +13,7 @@ interface ProfileState {
     data: { username: string; display_name: string; bio?: string },
   ) => Promise<{ error: Error | null }>
   updateProfile: (
-    userId: string,
+    profileId: string,
     data: { username?: string; display_name?: string; bio?: string },
   ) => Promise<{ error: Error | null }>
   checkUsernameAvailable: (username: string, currentUserId?: string) => Promise<boolean>
@@ -27,10 +27,17 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   setProfile: (profile) => set({ profile }),
   setIsLoading: (isLoading) => set({ isLoading }),
 
+  // userId = auth.users.id → profiles.user_id로 조회
   fetchProfile: async (userId) => {
     try {
       set({ isLoading: true })
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single()
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -50,12 +57,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
+  // userId = auth.users.id → user_id 컬럼으로 삽입, id는 DB에서 자동 생성
   createProfile: async (userId, data) => {
     try {
       const { data: newProfile, error } = await supabase
         .from('profiles')
         .insert({
-          id: userId,
+          user_id: userId,
           username: data.username,
           display_name: data.display_name,
           bio: data.bio || '',
@@ -65,7 +73,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
       if (error) throw error
 
-      // 직접 profile 설정 (fetchProfile 호출하지 않음)
       set({ profile: newProfile, isLoading: false })
       return { error: null }
     } catch (error) {
@@ -73,7 +80,8 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
-  updateProfile: async (userId, data) => {
+  // profileId = profiles.id (UUID) → eq('id', profileId)로 수정
+  updateProfile: async (profileId, data) => {
     try {
       const updateData: Partial<Profile> = {}
       if (data.username !== undefined) updateData.username = data.username
@@ -83,13 +91,12 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       const { data: updatedProfile, error } = await supabase
         .from('profiles')
         .update(updateData)
-        .eq('id', userId)
+        .eq('id', profileId)
         .select()
         .single()
 
       if (error) throw error
 
-      // 직접 profile 설정 (fetchProfile 호출하지 않음)
       set({ profile: updatedProfile, isLoading: false })
       return { error: null }
     } catch (error) {
@@ -97,17 +104,22 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
+  // user_id로 조회, 자기 자신 username인지는 user_id로 비교
   checkUsernameAvailable: async (username, currentUserId) => {
     try {
-      const { data, error } = await supabase.from('profiles').select('id').eq('username', username).maybeSingle()
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, user_id')
+        .eq('username', username)
+        .maybeSingle()
 
       if (error) throw error
 
       // 데이터가 없으면 사용 가능
       if (!data) return true
 
-      // 본인의 username이면 사용 가능
-      if (currentUserId && data.id === currentUserId) return true
+      // 본인의 username이면 사용 가능 (user_id로 비교)
+      if (currentUserId && data.user_id === currentUserId) return true
 
       return false
     } catch (error) {
@@ -116,10 +128,16 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
-  // 프로필 이미지 업데이트 후 최신 데이터로 새로고침하는 함수 추가
+  // user_id로 최신 프로필 새로고침
   refreshProfile: async (userId: string) => {
     try {
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single()
       if (error) throw error
       set({ profile: data })
     } catch (error) {

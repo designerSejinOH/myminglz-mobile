@@ -48,7 +48,7 @@ export async function DELETE() {
     )
 
     // 프로필 삭제 (CASCADE로 자동 삭제될 수 있지만 명시적으로 삭제)
-    await supabaseAdmin.from('profiles').delete().eq('id', user.id)
+    await supabaseAdmin.from('profiles').delete().eq('user_id', user.id)
 
     // Auth 사용자 삭제
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
