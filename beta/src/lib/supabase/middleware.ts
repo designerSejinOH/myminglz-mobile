@@ -69,7 +69,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 3. 이메일 확인된 사용자 - 프로필 체크
-  const { data: profile } = await supabase.from('profiles').select('id').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('id').eq('user_id', user.id).single()
 
   const hasProfile = !!profile
 
