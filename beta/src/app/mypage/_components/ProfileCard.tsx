@@ -5,8 +5,12 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import classNames from 'classnames'
 import { Profile } from '@/types'
+import { useFollowCount } from '@/hooks/useFollowCount'
+import { useFollowList } from '@/hooks/useFollowList'
+import { useFollow } from '@/hooks/useFollow'
 
 interface ProfileCardProps {
+  mode: 'user' | 'guest'
   profiles?: Profile[]
 }
 
@@ -14,6 +18,10 @@ export const ProfileCard = (props: ProfileCardProps) => {
   const { profiles } = props
 
   const main_profile = profiles ? profiles[0] : null
+  // 팔로우 기능
+  const { isFollowing, isLoading: isFollowLoading, toggleFollow } = useFollow(main_profile?.id || '')
+  const { followerCount, followingCount } = useFollowCount(main_profile?.id || '')
+  const { list, isLoading: isFollowListLoading } = useFollowList(main_profile?.id || '', 'followers')
 
   const [isProfileImageModalOpen, setIsProfileImageModalOpen] = useState({
     open: false,
@@ -54,8 +62,8 @@ export const ProfileCard = (props: ProfileCardProps) => {
               <Icon icon='plus' size={24} />
             </div>
           </div>
-          <button className='w-fit h-10'>
-            <Icon icon='down' size={24} />
+          <button onClick={toggleFollow} disabled={isFollowLoading} className='border rounded-2xl px-4 w-fit h-10'>
+            {isFollowing ? '언팔로우' : '팔로우'}
           </button>
         </div>
         {/* contents */}
@@ -68,11 +76,11 @@ export const ProfileCard = (props: ProfileCardProps) => {
             <div className=' w-fit h-fit flex flex-row justify-start items-center gap-4'>
               <div className='w-fit h-fit flex flex-row text-sm leading-tight justify-start items-center gap-1'>
                 <span className='opacity-80'>팔로워</span>
-                <span className=''>0</span>
+                <span className=''>{followerCount}</span>
               </div>
               <div className='w-fit h-fit flex flex-row text-sm leading-tight justify-start items-center gap-1'>
                 <span className='opacity-80'>팔로잉</span>
-                <span className=''>0</span>
+                <span className=''>{followingCount}</span>
               </div>
             </div>
           </div>
