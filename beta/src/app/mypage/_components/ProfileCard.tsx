@@ -4,19 +4,16 @@ import { Icon } from '@/components'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import classNames from 'classnames'
+import { Profile } from '@/types'
 
 interface ProfileCardProps {
-  id: string
-  follower: number
-  following: number
-  profileImage: string
-  name: string
-  subname: string
-  description: string
+  profiles?: Profile[]
 }
 
 export const ProfileCard = (props: ProfileCardProps) => {
-  const { id, follower, following, profileImage, name, subname, description } = props
+  const { profiles } = props
+
+  const main_profile = profiles ? profiles[0] : null
 
   const [isProfileImageModalOpen, setIsProfileImageModalOpen] = useState({
     open: false,
@@ -40,13 +37,20 @@ export const ProfileCard = (props: ProfileCardProps) => {
         className={classNames('w-full h-full rounded-2xl bg-card flex flex-col justify-start items-center')}
       >
         {/* header */}
-        <div className='w-full h-fit flex flex-row justify-between items-center px-4 py-4 '>
-          <div className='h-fit flex flex-row justify-start items-center gap-2'>
-            <div className='h-fit flex flex-row justify-start items-center -space-x-3'>
-              <div className='w-10 h-10 bg-white outline outline-2 outline-card rounded-full z-10'></div>
-              <div className='w-10 h-10 bg-white outline outline-2 outline-card rounded-full'></div>
-            </div>
-            <div className='w-10 h-10 bg-white/10 flex justify-center items-center rounded-full z-10'>
+        <div className='w-full h-fit flex flex-row justify-between items-center px-4 py-4 gap-2'>
+          {/* TODO: 멀티프로필 */}
+          <div className='h-fit flex flex-row justify-start items-center -space-x-2'>
+            {profiles?.map((profile, index, arr) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={index}
+                src={profile?.profile_image ? profile.profile_image : '/img/sample/profile.png'}
+                alt={`follower-${index}`}
+                style={{ zIndex: arr.length - index }}
+                className='w-10 h-10 bg-black rounded-full object-cover outline outline-1.5 outline-card'
+              />
+            ))}
+            <div className='w-10 h-10 ml-4 bg-white/10 flex justify-center items-center rounded-full z-10'>
               <Icon icon='plus' size={24} />
             </div>
           </div>
@@ -59,22 +63,22 @@ export const ProfileCard = (props: ProfileCardProps) => {
         <div className='w-full h-full relative px-4 pb-4 flex flex-col justify-center items-center gap-4'>
           <div className=' w-full h-fit flex flex-col justify-start items-start gap-3'>
             <div className=' w-full h-fit'>
-              <h1 className='text-3xl font-semibold leading-tight'>{id}</h1>
+              <h1 className='text-3xl font-semibold leading-tight'>{main_profile?.username || 'unknown'}</h1>
             </div>
             <div className=' w-fit h-fit flex flex-row justify-start items-center gap-4'>
               <div className='w-fit h-fit flex flex-row text-sm leading-tight justify-start items-center gap-1'>
                 <span className='opacity-80'>팔로워</span>
-                <span className=''>{follower}</span>
+                <span className=''>0</span>
               </div>
               <div className='w-fit h-fit flex flex-row text-sm leading-tight justify-start items-center gap-1'>
                 <span className='opacity-80'>팔로잉</span>
-                <span className=''>{following}</span>
+                <span className=''>0</span>
               </div>
             </div>
           </div>
           {/* middle */}
           <div className='w-full h-full flex justify-center items-center rounded-xl overflow-hidden relative'>
-            {profileImage === null ? (
+            {main_profile?.profile_image === null ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 onClick={(e) => {
@@ -92,7 +96,7 @@ export const ProfileCard = (props: ProfileCardProps) => {
                   e.stopPropagation()
                   handleClickImage(e)
                 }}
-                src={profileImage}
+                src={main_profile?.profile_image || '/img/sample/profile.png'}
                 alt='profile'
                 className='absolute w-auto h-full object-cover active:scale-95 transition-transform duration-200 ease-in-out'
               />
@@ -100,9 +104,13 @@ export const ProfileCard = (props: ProfileCardProps) => {
           </div>
           {/* bottom */}
           <div className='w-full h-fit flex flex-col justify-start items-start gap-2'>
-            <div className='w-full h-fit text-xl font-semibold leading-tight'>{name}</div>
-            <div className='w-full h-fit text-base font-medium leading-tight'>{subname}</div>
-            <p className='w-full h-fit text-sm font-normal leading-normal opacity-90'>{description}</p>
+            <div className='w-full h-fit text-xl font-semibold leading-tight'>
+              {main_profile?.display_name || 'Unknown User'}
+            </div>
+            <div className='w-full h-fit text-base font-medium leading-tight'>
+              {main_profile?.username || 'unknown'}
+            </div>
+            <p className='w-full h-fit text-sm font-normal leading-normal opacity-90'>{main_profile?.bio || ''}</p>
           </div>
         </div>
       </div>

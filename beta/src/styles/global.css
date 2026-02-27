@@ -1,4 +1,4 @@
-@import "tailwindcss" important;
+@import "tailwindcss";
 @import "tailwindcss-safe-area";
 
 @theme {
@@ -121,47 +121,96 @@
 
 /* Custom drop shadow utility */
 @utility drop-shadow-white {
-  filter: drop-shadow(0px 1px 0px rgba(255, 255, 255, 0.50))
-    drop-shadow(1px 0px 0px rgba(255, 255, 255, 0.50))
-    drop-shadow(-1px 0px 0px rgba(255, 255, 255, 0.50))
-    drop-shadow(0px -1px 0px rgba(255, 255, 255, 0.50));
+  filter: drop-shadow(0px 1px 0px rgba(255, 255, 255, 0.50)) drop-shadow(1px 0px 0px rgba(255, 255, 255, 0.50)) drop-shadow(-1px 0px 0px rgba(255, 255, 255, 0.50)) drop-shadow(0px -1px 0px rgba(255, 255, 255, 0.50));
 }
 
 /* Keyframes */
 @keyframes step-in {
-  0% { opacity: 100%; transform: scale(1); }
-  100% { opacity: 30%; transform: scale(0.95); }
+  0% {
+    opacity: 100%;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 30%;
+    transform: scale(0.95);
+  }
 }
 
 @keyframes step-out {
-  0% { opacity: 30%; transform: scale(0.95); }
-  100% { opacity: 100%; transform: scale(1); }
+  0% {
+    opacity: 30%;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 100%;
+    transform: scale(1);
+  }
 }
 
 @keyframes heartbeat {
-  0% { transform: scale(0.99); }
-  10% { transform: scale(1); }
-  20% { transform: scale(0.99); }
-  30% { transform: scale(1); }
-  40% { transform: scale(0.99); }
-  100% { transform: scale(0.99); }
+  0% {
+    transform: scale(0.99);
+  }
+
+  10% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(0.99);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(0.99);
+  }
+
+  100% {
+    transform: scale(0.99);
+  }
 }
 
 @keyframes breathe-tongue {
-  0% { transform: scaleY(1); }
-  50% { transform: scaleY(0.8); }
-  100% { transform: scaleY(1); }
+  0% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(0.8);
+  }
+
+  100% {
+    transform: scaleY(1);
+  }
 }
 
 @keyframes spining {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes wiggle {
-  0% { opacity: 100%; }
-  50% { opacity: 60%; }
-  100% { opacity: 100%; }
+  0% {
+    opacity: 100%;
+  }
+
+  50% {
+    opacity: 60%;
+  }
+
+  100% {
+    opacity: 100%;
+  }
 }
 
 /* Base styles */
@@ -210,7 +259,7 @@
     margin: 0;
     padding: 0;
     font-size: 100%;
-    background: #A2EADC;
+    background: #242424;
     color: #fff;
     width: 100vw;
     height: 100dvh;

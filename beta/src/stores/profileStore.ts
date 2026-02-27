@@ -1,14 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase'
-
-export interface Profile {
-  id: string
-  username: string
-  display_name: string
-  bio: string
-  created_at: string
-  updated_at: string
-}
+import { Profile } from '@/types'
 
 interface ProfileState {
   profile: Profile | null
@@ -16,9 +8,16 @@ interface ProfileState {
   setProfile: (profile: Profile | null) => void
   setIsLoading: (isLoading: boolean) => void
   fetchProfile: (userId: string) => Promise<Profile | null>
-  createProfile: (userId: string, data: { username: string; display_name: string; bio?: string }) => Promise<{ error: Error | null }>
-  updateProfile: (userId: string, data: { username?: string; display_name?: string; bio?: string }) => Promise<{ error: Error | null }>
+  createProfile: (
+    userId: string,
+    data: { username: string; display_name: string; bio?: string },
+  ) => Promise<{ error: Error | null }>
+  updateProfile: (
+    userId: string,
+    data: { username?: string; display_name?: string; bio?: string },
+  ) => Promise<{ error: Error | null }>
   checkUsernameAvailable: (username: string, currentUserId?: string) => Promise<boolean>
+  refreshProfile: (userId: string) => Promise<void>
 }
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
@@ -31,11 +30,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   fetchProfile: async (userId) => {
     try {
       set({ isLoading: true })
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -104,11 +99,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
   checkUsernameAvailable: async (username, currentUserId) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('username', username)
-        .maybeSingle()
+      const { data, error } = await supabase.from('profiles').select('id').eq('username', username).maybeSingle()
 
       if (error) throw error
 
@@ -122,6 +113,17 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     } catch (error) {
       console.error('Error checking username:', error)
       return false
+    }
+  },
+
+  // 프로필 이미지 업데이트 후 최신 데이터로 새로고침하는 함수 추가
+  refreshProfile: async (userId: string) => {
+    try {
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
+      if (error) throw error
+      set({ profile: data })
+    } catch (error) {
+      console.error('Error refreshing profile:', error)
     }
   },
 }))

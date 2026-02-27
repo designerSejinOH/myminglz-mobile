@@ -23,11 +23,25 @@ export default function Page() {
   }, [user, isLoading, isRedirecting, router])
 
   if (isLoading || isRedirecting) {
+    //사이트 저장된 모든 데이터 지우고 새로고침하는 기능
+    const handleReset = () => {
+      localStorage.clear()
+      sessionStorage.clear()
+      router.refresh()
+    }
+
     return (
       <Screen className='bg-[#242424] flex flex-col justify-center items-center'>
         <div className='animate-pulse'>
           <img src='/img/sample/profile.png' alt='logo' className='w-auto h-24' />
         </div>
+        <span className='text-sm mt-4 text-white/15'>잠시만 기다려주세요!</span>
+        <button
+          onClick={handleReset}
+          className='w-full mt-6 h-14 bg-primary rounded-full flex justify-center items-center active:scale-95 transition-transform duration-200'
+        >
+          <span className='text-lg font-semibold text-black'>문제가 계속되나요? 새로고침하기</span>
+        </button>
       </Screen>
     )
   }
@@ -57,7 +71,6 @@ export default function Page() {
         >
           <span className='text-lg font-semibold text-black'>회원가입</span>
         </button>
-
         <button
           onClick={() => router.push('/auth/login')}
           className='w-full h-14 bg-gray-800 rounded-full flex justify-center items-center active:scale-95 transition-transform duration-200'
@@ -65,7 +78,6 @@ export default function Page() {
           <span className='text-lg font-semibold text-gray-200'>로그인</span>
         </button>
       </div>
-
       <div className='w-full h-fit pb-6 text-center text-sm font-normal leading-[1.2] opacity-40'>© ZERONINEZ</div>
     </Screen>
   )

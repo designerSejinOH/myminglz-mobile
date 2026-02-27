@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Screen, Icon } from '@/components'
+import { Screen, Icon, ProfileImageUpload } from '@/components'
 import { useAuthStore } from '@/stores/authStore'
 import { useProfileStore } from '@/stores/profileStore'
 import classNames from 'classnames'
 import toast from 'react-hot-toast'
+import { active_classNames } from '@/theme/transitions'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -20,6 +21,9 @@ export default function SettingsPage() {
   const [bio, setBio] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
+
+  //프로필 이미지 편집 상태
+  const [isEditingImage, setIsEditingImage] = useState(false)
 
   // 계정 삭제 관련 상태
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -173,6 +177,30 @@ export default function SettingsPage() {
         }}
       >
         <div className='w-full h-full flex flex-col px-4 py-4 gap-6 overflow-y-auto pb-20'>
+          <section className='flex flex-col items-center gap-3'>
+            <div className={classNames('relative')}>
+              <img
+                src={profile?.profile_image || '/img/sample/profile.png'}
+                alt='Profile Image'
+                className='object-cover w-24 h-24 rounded-full overflow-hidden border border-white/30 shadow-lg'
+              />
+              <div
+                className={classNames(
+                  'absolute -right-1 z-10 -bottom-1 bg-black w-fit h-fit p-1.5 border border-white/50 rounded-full shadow-lg flex items-center justify-center',
+                  active_classNames,
+                )}
+                onClick={() => setIsEditingImage(true)}
+              >
+                <Icon icon='edit' size={16} className='text-white/70' />
+              </div>
+            </div>
+            <ProfileImageUpload
+              isOpen={isEditingImage}
+              onClose={() => setIsEditingImage(false)}
+              profileId={profile?.id || ''}
+              currentImageUrl={profile?.profile_image || null}
+            />
+          </section>
           {/* 프로필 섹션 */}
           <section className='flex flex-col gap-3'>
             <div className='flex flex-row justify-between items-center'>
